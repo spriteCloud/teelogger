@@ -2,6 +2,8 @@
 
 Mini wrapper around Ruby Logger for logging to multiple destinations.
 
+[![Gem Version](https://badge.fury.io/rb/teelogger.svg)](http://badge.fury.io/rb/teelogger)
+
 ## Installation
 
 Add this line to your application's Gemfile:
