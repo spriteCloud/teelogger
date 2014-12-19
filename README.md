@@ -1,6 +1,6 @@
 # Teelogger
 
-TODO: Write a gem description
+Mini wrapper around Ruby Logger for logging to multiple destinations.
 
 ## Installation
 
@@ -18,7 +18,29 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+ Behaves just like Ruby's Logger, and like a hash of String => Logger.
+
+A typical use might be to log to STDOUT, but also to a file:
+
+```ruby
+log = TeeLogger.new(STDOUT, "filename.log")
+log.level = Logger::WARN # applies to all outputs
+log.level = "INFO"       # convenience shortcut
+```
+
+By using the instance as a hash, you can also set individual log levels
+for individual loggers:
+
+```ruby
+log = TeeLogger.new(STDOUT, "filename.log")
+log.each do |name, logger|
+  if name.include?("filename.log")
+    logger.level = "WARN"
+  else
+    logger.level = "DEBUG"
+  end
+end
+```
 
 ## Contributing
 
