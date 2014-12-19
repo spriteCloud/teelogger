@@ -5,7 +5,7 @@ require 'teelogger/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "teelogger"
-  spec.version       = Teelogger::VERSION
+  spec.version       = TeeLogger::VERSION
   spec.authors       = ["Jens Finkhaeuser"]
   spec.email         = ["foss@spritecloud.com"]
   spec.summary       = %q{Mini wrapper around Ruby Logger for logging to multiple destinations.}
@@ -20,4 +20,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "cucumber"
 end
