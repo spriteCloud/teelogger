@@ -140,9 +140,25 @@ module TeeLogger
 
 
     ##
+    # For each log level, define an appropriate logging function
+    Logger::Severity.constants.each do |const|
+      meth = TeeLogger.string_level(const.to_s).downcase
+
+      define_method(meth) { |*args, &block|
+        dispatch(meth, *args, &block)
+      }
+      if "unknown" != meth
+        define_method("#{meth}?")  { |*args, &block|
+          dispatch(meth, *args, &block)
+        }
+      end
+    end
+
+
+    ##
     # Every function this class doesn't have should be mapped to the original
     # logger
-    def respond_to?(meth)
+    def respond_to_missing?(meth, include_private = false)
       if @loggers.nil? or @loggers.empty?
         raise "No loggers created, can't do anything."
       end
@@ -151,17 +167,24 @@ module TeeLogger
 
       # All loggers are the same, so we need to check only one of them.
       @loggers.each do |key, logger|
-        if logger.respond_to? meth_name
+        if logger.respond_to?(meth_name, include_private)
           return true
         end
         break
       end
 
       # If this didn't work, we're also emulating a hash
-      return @loggers.respond_to? meth_name
+      return @loggers.respond_to?(meth_name, include_private)
     end
 
     def method_missing(meth, *args, &block)
+      dispatch(meth, *args, &block)
+    end
+
+  private
+
+
+    def dispatch(meth, *args, &block)
       meth_name = meth.to_s
 
       if @loggers.nil? or @loggers.empty?
@@ -195,5 +218,6 @@ module TeeLogger
       # hash.
       return @loggers.send(meth_name, *args, &block)
     end
+
   end
 end
