@@ -38,6 +38,10 @@ Given(/^I create a TeeLogger with an IO object$/) do
   logger = TeeLogger::TeeLogger.new io
 end
 
+Then(/^I expect the log message to appear in the IO object$/) do
+  assert io.string.include?(message), "Test message '#{message}' not included in output."
+end
+
 Given(/^I create a TeeLogger with multiple loggers$/) do
   args = []
   3.times do
@@ -53,10 +57,3 @@ Then(/^I expect the class to let me access all loggers like a hash$/) do
   end
 end
 
-Then(/^I (.+) the log message to appear in the IO object$/) do |expectation|
-  if expectation == 'expect'
-    assert io.string.include?(message), "Test message '#{message}' not included in output."
-  else
-    assert (not io.string.include?(message)), "Test message '#{message}' included in output."
-  end
-end
