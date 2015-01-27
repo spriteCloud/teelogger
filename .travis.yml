@@ -1,0 +1,7 @@
+install:
+  - "bundle install"
+script:
+  - "bundle exec cucumber"
+os:
+  - linux
+  - osx
