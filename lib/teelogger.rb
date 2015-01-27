@@ -33,6 +33,37 @@ module TeeLogger
     @default_level = Logger::Severity::INFO
     @loggers
 
+    ##
+    # Convert a log level to its string name
+    def self.string_level(level)
+      if level.is_a? String
+        return level
+      end
+
+      Logger::Severity.constants.each do |const|
+        if level == Logger.const_get(const)
+          return const
+        end
+      end
+
+      return nil
+    end
+
+    ##
+    # Convert a string log level to its constant value
+    def self.convert_level(val)
+      if val.is_a? String
+        begin
+          val = Logger.const_get(val)
+        rescue NameError
+          val = Logger::Severity::WARN
+        end
+      end
+
+      return val
+    end
+
+
 
     ##
     # Add a logger to the current loggers.
@@ -48,8 +79,8 @@ module TeeLogger
         logger = Logger.new(file)
 
         # Initialize logger
-        logger.unknown "Logging to '#{arg}' initialized with level #{string_level(@default_level)}."
-        logger.level = convert_level(@default_level)
+        logger.unknown "Logging to '#{arg}' initialized with level #{TeeLogger.string_level(@default_level)}."
+        logger.level = TeeLogger.convert_level(@default_level)
       else
         # We have some other object - let's hope it's an IO object
         key = arg.to_s
@@ -58,8 +89,8 @@ module TeeLogger
         logger = Logger.new(arg)
 
         # Initialize logger
-        logger.unknown "Logging to #{key} initialized with level #{string_level(@default_level)}."
-        logger.level = convert_level(@default_level)
+        logger.unknown "Logging to #{key} initialized with level #{TeeLogger.string_level(@default_level)}."
+        logger.level = TeeLogger.convert_level(@default_level)
       end
 
       if not key.nil? and not logger.nil?
@@ -86,41 +117,10 @@ module TeeLogger
     end
 
     ##
-    # Convert a log level to its string name
-    def string_level(level)
-      if level.is_a? String
-        return level
-      end
-
-      Logger::Severity.constants.each do |const|
-        if level == Logger.const_get(const)
-          return const
-        end
-      end
-
-      return nil
-    end
-
-    ##
-    # Convert a string log level to its constant value
-    def convert_level(val)
-      if val.is_a? String
-        begin
-          val = Logger.const_get(val)
-        rescue NameError
-          val = Logger::Severity::WARN
-        end
-      end
-
-      return val
-    end
-
-
-    ##
     # Set log level; override this to also accept strings
     def level=(val)
       # Convert strings to the constant value
-      val = convert_level(val)
+      val = TeeLogger.convert_level(val)
 
       # Update the default log level
       @default_level = val
