@@ -26,15 +26,15 @@ Feature: Logger
     And I set the log level to "<level>"
     And I write a log message at log level "<level>"
     Then I expect the log level "<level>" to have taken hold
-    And I expect the log message to appear in the IO object
+    And I <expectation> the log message to appear in the IO object
 
     Examples:
-      | level |
-      | DEBUG |
-      | INFO  |
-      | WARN  |
-      | ERROR |
-      | FATAL |
+      | level | expectation  |
+      | DEBUG | expect       |
+      | INFO  | expect       |
+      | WARN  | don't expect |
+      | ERROR | expect       |
+      | FATAL | expect       |
 
   @logger_03
   Scenario: multiple loggers
