@@ -1,4 +1,8 @@
-require 'test/unit/assertions'
+begin
+  require 'test/unit/assertions'
+rescue LoadError
+  require 'minitest/assertions'
+end
 
 message = "test message"
 io = nil
