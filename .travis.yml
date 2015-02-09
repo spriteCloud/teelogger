@@ -5,6 +5,11 @@ script:
 os:
   - linux
   - osx
+language: ruby
 rvm:
   - 1.9.3  
   - 2.0.0
+notifications:
+  email:
+    recipients:
+      - foss@spritecloud.com
