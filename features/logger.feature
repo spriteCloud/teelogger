@@ -40,3 +40,19 @@ Feature: Logger
   Scenario: multiple loggers
     Given I create a TeeLogger with multiple loggers
     Then I expect the class to let me access all loggers like a hash
+
+  @logger_04
+  Scenario Outline: Default logger without setting level
+    Given I create a TeeLogger with default parameters
+    And I write a log message at log level "<level>"
+    Then I expect the log level "<level>" to <condition> taken hold
+    And I expect the log message to appear on the screen
+
+    Examples:
+      | level | condition |
+      | DEBUG | not have  |
+      | INFO  | have      |
+      | WARN  | have      |
+      | ERROR | have      |
+      | FATAL | have      |
+
