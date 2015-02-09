@@ -25,11 +25,16 @@ Then(/^I expect the log message to appear on the screen$/) do
   puts "Can't test this; please check manually"
 end
 
-Then(/^I expect the log level "(.*?)" to have taken hold$/) do |level|
+Then(/^I expect the log level "(.*?)" to (.*?) taken hold$/) do |level, condition|
   meth = "#{level.downcase}?".to_sym
   res = logger.send(meth)
 
-  assert res, "Log level not active!"
+  assert res, "Bad results!"
+  if 'have' === condition
+    assert res[0], "Log level not active!"
+  else
+    assert !res[0], "Log level is active!"
+  end
 end
 
 
