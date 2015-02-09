@@ -30,7 +30,7 @@ module TeeLogger
   #     end
   #   end
   class TeeLogger
-    @default_level = Logger::Severity::INFO
+    @default_level
     @loggers
 
     ##
@@ -54,7 +54,7 @@ module TeeLogger
     def self.convert_level(val)
       if val.is_a? String
         begin
-          val = Logger.const_get(val)
+          val = Logger.const_get(val.upcase)
         rescue NameError
           val = Logger::Severity::WARN
         end
@@ -108,6 +108,7 @@ module TeeLogger
       end
 
       # Initialization
+      @default_level = Logger::Severity::INFO
       @loggers = {}
 
       # Create logs for all arguments
@@ -148,8 +149,9 @@ module TeeLogger
         dispatch(meth, *args, &block)
       }
       if "unknown" != meth
-        define_method("#{meth}?")  { |*args, &block|
-          dispatch(meth, *args, &block)
+        query = "#{meth}?"
+        define_method(query)  { |*args, &block|
+          dispatch(query, *args, &block)
         }
       end
     end
@@ -192,19 +194,25 @@ module TeeLogger
       end
 
       # Compose message
-      message = ""
-      args.each do |arg|
-        message += arg.inspect
+      msg = args.map do |arg|
+        if arg.is_a? String
+          arg
+        else
+          arg.inspect
+        end
       end
+      message = msg.join("|")
 
       # Try to write the message to all loggers.
       ret = []
       @loggers.each do |key, logger|
         if logger.respond_to? meth_name
           if args.length > 0
-            ret << logger.send(meth_name, "[#{key}] #{message}", &block)
+            ret << logger.send(meth_name, key) do
+              message
+            end
           else
-            ret << logger.send(meth_name, *args, &block)
+            ret << logger.send(meth_name, &block)
           end
         end
       end
