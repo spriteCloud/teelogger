@@ -28,6 +28,7 @@ end
 Then(/^I expect the log level "(.*?)" to (.*?) taken hold$/) do |level, condition|
   meth = "#{level.downcase}?".to_sym
   res = logger.send(meth)
+  logger.flush
 
   assert res, "Bad results!"
   if 'have' === condition

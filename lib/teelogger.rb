@@ -2,7 +2,7 @@
 # TeeLogger
 # https://github.com/spriteCloud/teelogger
 #
-# Copyright (c) 2014 spriteCloud B.V. and other TeeLogger contributors.
+# Copyright (c) 2014-2015 spriteCloud B.V. and other TeeLogger contributors.
 # All rights reserved.
 #
 require "teelogger/version"
@@ -32,6 +32,7 @@ module TeeLogger
   class TeeLogger
     @default_level
     @loggers
+    @ios
 
     ##
     # Convert a log level to its string name
@@ -70,31 +71,34 @@ module TeeLogger
     def add_logger(arg)
       key = nil
       logger = nil
+      io = nil
       if arg.is_a? String
         # We have a filename
         key = File.basename(arg)
 
         # Try to create the logger.
-        file = File.new(arg, File::WRONLY | File::APPEND | File::CREAT)
-        logger = Logger.new(file)
+        io = File.new(arg, File::WRONLY | File::APPEND | File::CREAT)
+        logger = Logger.new(io)
 
         # Initialize logger
-        logger.unknown "Logging to '#{arg}' initialized with level #{TeeLogger.string_level(@default_level)}."
+        io.write "Logging to '#{arg}' initialized with level #{TeeLogger.string_level(@default_level)}.\n"
         logger.level = TeeLogger.convert_level(@default_level)
       else
         # We have some other object - let's hope it's an IO object
         key = arg.to_s
 
         # Try to create the logger.
-        logger = Logger.new(arg)
+        io = arg
+        logger = Logger.new(io)
 
         # Initialize logger
-        logger.unknown "Logging to #{key} initialized with level #{TeeLogger.string_level(@default_level)}."
+        io.write "Logging to #{key} initialized with level #{TeeLogger.string_level(@default_level)}.\n"
         logger.level = TeeLogger.convert_level(@default_level)
       end
 
-      if not key.nil? and not logger.nil?
+      if not key.nil? and not logger.nil? and not io.nil?
         @loggers[key] = logger
+        @ios[key] = io
       end
     end
 
@@ -109,7 +113,9 @@ module TeeLogger
 
       # Initialization
       @default_level = Logger::Severity::INFO
+      @default_flush = 2000 # Flush every 2000 lines.
       @loggers = {}
+      @ios = {}
 
       # Create logs for all arguments
       args.each do |arg|
@@ -154,6 +160,25 @@ module TeeLogger
           dispatch(query, *args, &block)
         }
       end
+    end
+
+
+    ##
+    # Flush all loggers, flushing both ruby and OS buffers (if applicable)
+    def flush
+      if @ios.nil? or @ios.empty?
+        raise "No IO objects created, can't do anything."
+      end
+
+      @ios.each do |key, io|
+        io.flush
+        begin
+          io.fsync
+        rescue NotImplementedError, Errno::EINVAL
+          # pass
+        end
+      end
+
     end
 
 
