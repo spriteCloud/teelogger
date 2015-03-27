@@ -2,9 +2,9 @@
 # TeeLogger
 # https://github.com/spriteCloud/teelogger
 #
-# Copyright (c) 2014 spriteCloud B.V. and other TeeLogger contributors.
+# Copyright (c) 2014,2015 spriteCloud B.V. and other TeeLogger contributors.
 # All rights reserved.
 #
 module TeeLogger
-  VERSION = "0.3.0"
+  VERSION = "0.4.0"
 end
