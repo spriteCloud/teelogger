@@ -10,6 +10,49 @@ require "teelogger/version"
 require "logger"
 
 module TeeLogger
+  DEFAULT_FLUSH_INTERVAL = 2000
+
+  ##
+  # Extensions for the ruby logger
+  module LoggerExtensions
+    attr_accessor :teelogger_io
+    attr_accessor :flush_interval
+
+    ##
+    # Flush ruby and OS buffers for this logger
+    def flush
+      if @teelogger_io.nil?
+        raise "TeeLogger logger without IO object, can't do anything"
+      end
+
+      @teelogger_io.flush
+      begin
+        @teelogger_io.fsync
+      rescue NotImplementedError, Errno::EINVAL
+        # pass
+      end
+    end
+
+
+    ##
+    # This function invokes flush if it's been invoked more often than
+    # flush_interval.
+    def auto_flush
+      if @written.nil?
+        @written = 0
+      end
+
+      @written += 1
+
+      if @written >= self.flush_interval
+        self.flush
+        @written = 0
+      end
+    end
+  end # module LoggerExtensions
+
+
+
   ##
   # Logger that writes to multiple outputs. Behaves just like Ruby's Logger,
   # and like a hash of String => Logger.
@@ -64,7 +107,12 @@ module TeeLogger
       return val
     end
 
+private
+    ##
+    # Define log functions as strings, for internal re-use
+    LOG_FUNCTIONS = Logger::Severity.constants.map { |level| TeeLogger.string_level(level.to_s).downcase }
 
+public
 
     ##
     # Add a logger to the current loggers.
@@ -96,6 +144,11 @@ module TeeLogger
         logger.level = TeeLogger.convert_level(@default_level)
       end
 
+      # Extend logger instances with extra functionality
+      logger.extend(LoggerExtensions)
+      logger.teelogger_io = io
+      logger.flush_interval = DEFAULT_FLUSH_INTERVAL
+
       if not key.nil? and not logger.nil? and not io.nil?
         @loggers[key] = logger
         @ios[key] = io
@@ -113,7 +166,6 @@ module TeeLogger
 
       # Initialization
       @default_level = Logger::Severity::INFO
-      @default_flush = 2000 # Flush every 2000 lines.
       @loggers = {}
       @ios = {}
 
@@ -122,6 +174,7 @@ module TeeLogger
         add_logger(arg)
       end
     end
+
 
     ##
     # Set log level; override this to also accept strings
@@ -148,13 +201,16 @@ module TeeLogger
 
     ##
     # For each log level, define an appropriate logging function
-    Logger::Severity.constants.each do |const|
-      meth = TeeLogger.string_level(const.to_s).downcase
-
+    ["add"] + LOG_FUNCTIONS.each do |meth|
+      # Methods corresponding to severity levels will be auto_flushed
       define_method(meth) { |*args, &block|
-        dispatch(meth, *args, &block)
+        x = dispatch(meth, *args, &block)
+        dispatch("auto_flush")
+        x
       }
-      if "unknown" != meth
+
+      # Query methods for severity levels are defined
+      if not ["unknown", "add"].include? meth
         query = "#{meth}?"
         define_method(query)  { |*args, &block|
           dispatch(query, *args, &block)
@@ -164,21 +220,14 @@ module TeeLogger
 
 
     ##
-    # Flush all loggers, flushing both ruby and OS buffers (if applicable)
-    def flush
-      if @ios.nil? or @ios.empty?
-        raise "No IO objects created, can't do anything."
+    # Add flush related functions from LoggerExtensions
+    LoggerExtensions.instance_methods(false).each do |method|
+      name = method.to_s
+      if name.start_with?("flush")
+        define_method(name) { |*args, &block|
+          dispatch(name, *args, &block)
+        }
       end
-
-      @ios.each do |key, io|
-        io.flush
-        begin
-          io.fsync
-        rescue NotImplementedError, Errno::EINVAL
-          # pass
-        end
-      end
-
     end
 
 
@@ -232,12 +281,12 @@ module TeeLogger
       ret = []
       @loggers.each do |key, logger|
         if logger.respond_to? meth_name
-          if args.length > 0
+          if LOG_FUNCTIONS.include? meth_name
             ret << logger.send(meth_name, key) do
               message
             end
           else
-            ret << logger.send(meth_name, &block)
+            ret << logger.send(meth_name, *args, &block)
           end
         end
       end
@@ -253,4 +302,5 @@ module TeeLogger
     end
 
   end
+
 end
