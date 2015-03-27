@@ -10,7 +10,15 @@ logger = nil
 
 Given(/^I create a TeeLogger with default parameters$/) do
   logger = TeeLogger::TeeLogger.new
+  assert [TeeLogger::DEFAULT_FLUSH_INTERVAL] == logger.flush_interval, "Flush interval is not default: #{logger.flush_interval}"
 end
+
+Given(/^I set the flush_interval to "([^"]*)"$/) do |interval|
+  i = interval.to_i
+  logger.flush_interval = i
+  assert [i] == logger.flush_interval, "Setting flush interval did not take: #{logger.flush_interval}"
+end
+
 
 Given(/^I set the log level to "(.*?)"$/) do |level|
   logger.level = level

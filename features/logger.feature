@@ -56,3 +56,20 @@ Feature: Logger
       | ERROR | have      |
       | FATAL | have      |
 
+  @logger_05
+  Scenario Outline: Flushing after each invocation
+    Given I create a TeeLogger with default parameters
+    And I set the flush_interval to "1"
+    And I set the log level to "<level>"
+    And I write a log message at log level "<level>"
+    Then I expect the log level "<level>" to have taken hold
+    And I expect the log message to appear on the screen
+
+    Examples:
+      | level |
+      | DEBUG |
+      | INFO  |
+      | WARN  |
+      | ERROR |
+      | FATAL |
+
