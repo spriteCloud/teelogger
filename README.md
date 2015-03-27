@@ -49,6 +49,23 @@ log.each do |name, logger|
 end
 ```
 
+Unlike the standard Ruby logger, flushing log contents is more deterministic.
+`TeeLogger#flush` flushes not only the Ruby buffers of all loggers, but also
+tries to invoke [IO#fsync](http://ruby-doc.org/core-2.2.1/IO.html#method-i-fsync).
+In addition, `TeeLogger` lets you set a flush interval indicating after how
+many messages logged `TeeLogger#flush` is to be invoked automatically:
+
+```ruby
+require 'teelogger'
+
+log = TeeLogger::TeeLogger.new(STDOUT, "filename.log")
+log.flush_interval = 1                  # flush every line
+log["filename.log"].flush_interval = 2  # flush every other line
+
+log.info "first message"  # flushes STDOUT
+log.info "second message" # flushes STDOUT and filename.log
+```
+
 ## Contributing
 
 1. Fork it ( https://github.com/[my-github-username]/teelogger/fork )
