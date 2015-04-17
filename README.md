@@ -4,6 +4,8 @@ Mini wrapper around Ruby Logger for logging to multiple destinations.
 
 [![Gem Version](https://badge.fury.io/rb/teelogger.svg)](http://badge.fury.io/rb/teelogger)
 [![Build Status](https://travis-ci.org/spriteCloud/teelogger.svg?branch=master)](https://travis-ci.org/spriteCloud/teelogger)
+[![Code Climate](https://codeclimate.com/github/spriteCloud/teelogger/badges/gpa.svg)](https://codeclimate.com/github/spriteCloud/teelogger)
+[![Test Coverage](https://codeclimate.com/github/spriteCloud/teelogger/badges/coverage.svg)](https://codeclimate.com/github/spriteCloud/teelogger)
 
 ## Installation
 
