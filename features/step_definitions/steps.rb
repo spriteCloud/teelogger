@@ -52,10 +52,6 @@ Given(/^I create a TeeLogger with an IO object$/) do
   logger = TeeLogger::TeeLogger.new io
 end
 
-Then(/^I expect the log message to appear in the IO object$/) do
-  assert io.string.include?(message), "Test message '#{message}' not included in output."
-end
-
 Given(/^I create a TeeLogger with multiple loggers$/) do
   args = []
   3.times do
@@ -68,6 +64,28 @@ Then(/^I expect the class to let me access all loggers like a hash$/) do
   assert (3 == logger.length), "Expected 3 loggers, got #{logger.length}"
   logger.each do |key, logger|
     assert logger.is_a?(Logger), "Found a non-Logger object."
+  end
+end
+
+
+Given(/^I log an exception$/) do
+  begin
+    raise "Some error"
+  rescue StandardError => err
+    message = "@@EXCEPTION@@"
+    logger.exception(message, err)
+  end
+end
+
+Then(/^I expect the log message to (.*?) in the IO object$/) do |appear|
+  appear.strip!
+  case appear
+    when "appear"
+      assert io.string.include?(message), "Test message '#{message}' not included in output."
+    when "not appear"
+      assert !io.string.include?(message), "Test message '#{message}' included in output, didn't expect that!"
+    else
+      raise "Not implemented: appear == '#{appear}'"
   end
 end
 

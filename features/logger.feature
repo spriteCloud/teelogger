@@ -73,3 +73,20 @@ Feature: Logger
       | ERROR |
       | FATAL |
 
+  @logger_06
+  Scenario Outline: Exception logging
+    Given I create a TeeLogger with an IO object
+    And I set the log level to "<level>"
+    And I log an exception
+    Then I expect the log level "<level>" to have taken hold
+    And I expect the log message to <appear> in the IO object
+
+    Examples:
+      | level | appear     |
+      | DEBUG | appear     |
+      | INFO  | appear     |
+      | WARN  | appear     |
+      | ERROR | appear     |
+      | FATAL | not appear |
+
+
