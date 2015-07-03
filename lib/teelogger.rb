@@ -7,6 +7,7 @@
 #
 require "teelogger/version"
 require "teelogger/extensions"
+require "teelogger/levels"
 
 require "logger"
 
@@ -33,44 +34,20 @@ module TeeLogger
   #     end
   #   end
   class TeeLogger
+    # Extends and includes
+    extend  ::TeeLogger::Levels
+    include ::TeeLogger::Levels
+
+    # Properties
     @default_level
     @loggers
     @ios
 
-    ##
-    # Convert a log level to its string name
-    def self.string_level(level)
-      if level.is_a? String
-        return level
-      end
-
-      Logger::Severity.constants.each do |const|
-        if level == Logger.const_get(const)
-          return const
-        end
-      end
-
-      return nil
-    end
-
-    ##
-    # Convert a string log level to its constant value
-    def self.convert_level(val)
-      if val.is_a? String
-        begin
-          val = Logger.const_get(val.upcase)
-        rescue NameError
-          raise "Invalid log level '#{val}' specified."
-        end
-      end
-
-      return val
-    end
 
 private
     ##
     # Define log functions as strings, for internal re-use
-    LOG_FUNCTIONS = Logger::Severity.constants.map { |level| TeeLogger.string_level(level.to_s).downcase }
+    LOG_FUNCTIONS = Logger::Severity.constants.map { |level| string_level(level.to_s).downcase }
 
 public
 
@@ -89,8 +66,8 @@ public
         logger = Logger.new(io)
 
         # Initialize logger
-        io.write "Logging to '#{arg}' initialized with level #{TeeLogger.string_level(@default_level)}.\n"
-        logger.level = TeeLogger.convert_level(@default_level)
+        io.write "Logging to '#{arg}' initialized with level #{string_level(@default_level)}.\n"
+        logger.level = convert_level(@default_level)
       else
         # We have some other object - let's hope it's an IO object
         key = nil
@@ -108,12 +85,12 @@ public
         logger = Logger.new(io)
 
         # Initialize logger
-        io.write "Logging to #{key} initialized with level #{TeeLogger.string_level(@default_level)}.\n"
-        logger.level = TeeLogger.convert_level(@default_level)
+        io.write "Logging to #{key} initialized with level #{string_level(@default_level)}.\n"
+        logger.level = convert_level(@default_level)
       end
 
       # Extend logger instances with extra functionality
-      logger.extend(LoggerExtensions)
+      logger.extend(::TeeLogger::LoggerExtensions)
       logger.teelogger_io = io
       logger.flush_interval = DEFAULT_FLUSH_INTERVAL
 
@@ -148,7 +125,7 @@ public
     # Set log level; override this to also accept strings
     def level=(val)
       # Convert strings to the constant value
-      val = TeeLogger.convert_level(val)
+      val = convert_level(val)
 
       # Update the default log level
       @default_level = val
