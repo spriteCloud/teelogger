@@ -94,6 +94,9 @@ public
       logger.teelogger_io = io
       logger.flush_interval = DEFAULT_FLUSH_INTERVAL
 
+      # Flush the "Logging to..." line
+      logger.flush
+
       if not key.nil? and not logger.nil? and not io.nil?
         @loggers[key] = logger
         @ios[key] = io
