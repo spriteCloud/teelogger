@@ -133,7 +133,15 @@ public
         logger.level = TeeLogger.convert_level(@default_level)
       else
         # We have some other object - let's hope it's an IO object
-        key = arg.to_s
+        key = nil
+        case arg
+        when STDOUT
+          key = 'STDOUT'
+        when STDERR
+          key = 'STDERR'
+        else
+          key = arg.to_s
+        end
 
         # Try to create the logger.
         io = arg
