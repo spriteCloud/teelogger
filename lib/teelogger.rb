@@ -100,7 +100,7 @@ module TeeLogger
         begin
           val = Logger.const_get(val.upcase)
         rescue NameError
-          val = Logger::Severity::WARN
+          raise "Invalid log level '#{val}' specified."
         end
       end
 
