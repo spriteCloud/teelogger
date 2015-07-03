@@ -1,9 +1,3 @@
-begin
-  require 'test/unit/assertions'
-rescue LoadError
-  require 'minitest/assertions'
-end
-
 message = "test message"
 io = nil
 logger = nil
