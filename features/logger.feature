@@ -89,4 +89,24 @@ Feature: Logger
       | ERROR | appear     |
       | FATAL | not appear |
 
+  @logger_07
+  Scenario Outline: Bad log levels
+    Given I create a TeeLogger with default parameters
+    And I set the log level to "<initial>"
+    And I set the log level to "<level>"
+    Then I expect this to <raise> an exception
+    And I expect the log level to be "<result>"
+
+    Examples:
+      | initial | level    | raise     | result |
+      | fatal   | DeBuG    | not raise | debug  |
+      | fatal   | debugFOO | raise     | fatal  |
+      | fatal   | InfO     | not raise | info   |
+      | fatal   | infoFOO  | raise     | fatal  |
+      | fatal   | wARn     | not raise | warn   |
+      | fatal   | warnFOO  | raise     | fatal  |
+      | fatal   | eRrOR    | not raise | error  |
+      | fatal   | errorFOO | raise     | fatal  |
+      | debug   | faTAl    | not raise | fatal  |
+      | debug   | fatalFOO | raise     | debug  |
 

@@ -19,9 +19,14 @@ Given(/^I set the flush_interval to "([^"]*)"$/) do |interval|
   assert [i] == logger.flush_interval, "Setting flush interval did not take: #{logger.flush_interval}"
 end
 
-
+level_set_exception = nil
 Given(/^I set the log level to "(.*?)"$/) do |level|
-  logger.level = level
+  begin
+    logger.level = level
+    level_set_exception = nil
+  rescue StandardError => err
+    level_set_exception = err
+  end
 end
 
 Given(/^I write a log message at log level "(.*?)"$/) do |level|
@@ -31,6 +36,18 @@ end
 
 Then(/^I expect the log message to appear on the screen$/) do
   puts "Can't test this; please check manually"
+end
+
+Then(/^I expect this to ([^ ]*?) ?raise an exception$/) do |mod|
+  if mod.strip != "not"
+    assert !level_set_exception.nil?, "Expected an exception, but none was raised."
+  end
+end
+
+Then(/^I expect the log level to be "([^"]*)"$/) do |result|
+  puts logger.level
+  puts result
+  pending # Write code here that turns the phrase above into concrete actions
 end
 
 Then(/^I expect the log level "(.*?)" to (.*?) taken hold$/) do |level, condition|
