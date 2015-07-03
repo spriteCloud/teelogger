@@ -11,31 +11,29 @@ Feature: Formatter
     Then I expect the result to match "<result>"
 
     Examples:
-      | placeholder           | severity | time                     | progname | message      | result                          |
-      | severity              | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | INFO                            |
-      | severity              | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | INFO                            |
-      | short_severity        | iNFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | I                               |
-      | short_severity        | infO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | I                               |
-      | logger_timestamp      | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57.000000      |
-      | logger_timestamp      | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57.000000      |
-      | logger_timestamp      | InfO     | 2015-07-03T12:10:57+0100 | STDOUT   | test message | 2015-07-03T13:10:57.000000      |
-      | iso8601_timestamp     | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57\\\\+0000    |
-      | iso8601_timestamp     | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57\\\\+0000    |
-      | iso8601_timestamp     | InfO     | 2015-07-03T12:10:57+0100 | STDOUT   | test message | 2015-07-03T13:10:57\\\\+0[12]00 |
-      | iso8601_timestamp_utc | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57Z            |
-      | iso8601_timestamp_utc | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57Z            |
-      | iso8601_timestamp_utc | InfO     | 2015-07-03T12:10:57+0100 | STDOUT   | test message | 2015-07-03T11:10:57Z            |
-      | tai64n_timestamp      | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | @4000000055967bdb000001f4       |
-      | tai64n_timestamp      | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | @4000000055967bdb000001f4       |
-      | tai64n_timestamp      | InfO     | 2015-07-03T12:10:57+0100 | STDOUT   | test message | @4000000055966dcb000001f4       |
-      | logger                | iNFO     | 2015-07-03T12:10:57Z     | sTDouT   | test message | sTDouT                          |
-      | message               | iNFO     | 2015-07-03T12:10:57Z     | STDOUT   | teSt mESsage | teSt mESsage                    |
-      | pid                   | iNFO     | 2015-07-03T12:10:57Z     | STDOUT   | teSt mESsage | \\\\d+                          |
+      | placeholder           | severity | time                     | progname | message      | result                       |
+      | severity              | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | INFO                         |
+      | severity              | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | INFO                         |
+      | short_severity        | iNFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | I                            |
+      | short_severity        | infO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | I                            |
+      | logger_timestamp      | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57.000000   |
+      | logger_timestamp      | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57.000000   |
+      | logger_timestamp      | InfO     | 2015-07-03T12:10:57+0100 | STDOUT   | test message | 2015-07-03T11:10:57.000000   |
+      | iso8601_timestamp     | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57\\\\+0000 |
+      | iso8601_timestamp     | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57\\\\+0000 |
+      | iso8601_timestamp     | InfO     | 2015-07-03T12:10:57+0100 | STDOUT   | test message | 2015-07-03T11:10:57\\\\+0000 |
+      | iso8601_timestamp_utc | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57Z         |
+      | iso8601_timestamp_utc | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | 2015-07-03T12:10:57Z         |
+      | iso8601_timestamp_utc | InfO     | 2015-07-03T12:10:57+0100 | STDOUT   | test message | 2015-07-03T11:10:57Z         |
+      | tai64n_timestamp      | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | @4000000055967bdb000001f4    |
+      | tai64n_timestamp      | InfO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | @4000000055967bdb000001f4    |
+      | tai64n_timestamp      | InfO     | 2015-07-03T12:10:57+0100 | STDOUT   | test message | @4000000055966dcb000001f4    |
+      | logger                | iNFO     | 2015-07-03T12:10:57Z     | sTDouT   | test message | sTDouT                       |
+      | message               | iNFO     | 2015-07-03T12:10:57Z     | STDOUT   | teSt mESsage | teSt mESsage                 |
+      | pid                   | iNFO     | 2015-07-03T12:10:57Z     | STDOUT   | teSt mESsage | \\\\d+                       |
 
 
       # Note 1: need four \ to escape a special character in the regex field
-      # Note 2: tests may fail in summer/winter time? the offset of +0200 is
-      #         confusing.
 
   @formatter_02
   Scenario Outline: Format strings
