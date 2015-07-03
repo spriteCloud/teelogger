@@ -228,12 +228,33 @@ public
 
 
     def dispatch(meth, *args, &block)
-      meth_name = meth.to_s
-
       if @loggers.nil? or @loggers.empty?
         raise "No loggers created, can't do anything."
       end
 
+      # Try dispatching the call, with preprocessing based on whether it
+      # is a log function or not.
+      meth_name = meth.to_s
+
+      ret = []
+      if LOG_FUNCTIONS.include? meth_name
+        ret = dispatch_log(meth_name, *args)
+      else
+        ret = dispatch_other(meth_name, *args, &block)
+      end
+
+      # Some double checking on the return value(s).
+      if not ret.empty?
+        return ret
+      end
+
+      # If the method wasn't from the loggers, we'll try to send it to the
+      # hash.
+      return @loggers.send(meth_name, *args, &block)
+    end
+
+
+    def dispatch_log(meth_name, *args)
       # Compose message
       msg = args.map do |arg|
         if arg.is_a? String
@@ -248,26 +269,23 @@ public
       ret = []
       @loggers.each do |key, logger|
         if logger.respond_to? meth_name
-          if LOG_FUNCTIONS.include? meth_name
-            ret << logger.send(meth_name, key) do
-              message
-            end
-          else
-            ret << logger.send(meth_name, *args, &block)
+          ret << logger.send(meth_name, key) do
+            message
           end
         end
       end
-
-      # Some double checking on the return value(s).
-      if not ret.empty?
-        return ret
-      end
-
-      # If the method wasn't from the loggers, we'll try to send it to the
-      # hash.
-      return @loggers.send(meth_name, *args, &block)
+      return ret
     end
 
-  end
 
+    def dispatch_other(meth_name, *args, &block)
+      ret = []
+      @loggers.each do |key, logger|
+        if logger.respond_to? meth_name
+          ret << logger.send(meth_name, *args, &block)
+        end
+      end
+      return ret
+    end
+  end
 end
