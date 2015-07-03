@@ -66,16 +66,16 @@ module TeeLogger
     # Some format strings defined
 
     # Format string most similar to the Ruby logger
-    FORMAT_LOGGER = "{short_severity}, [{logger_timestamp} \#{pid}] {severity} -- {logger}: {message}"
+    FORMAT_LOGGER = "{short_severity}, [{logger_timestamp} \#{pid}] {severity} -- {logger}: {message}\n"
 
     # Default format string
-    FORMAT_DEFAULT = "{short_severity}, [{iso8601_timestamp} \#{pid}] {logger}: {message}"
+    FORMAT_DEFAULT = "{short_severity}, [{iso8601_timestamp} \#{pid}] {logger}: {message}\n"
 
     # Shorter format string
-    FORMAT_SHORT = "{short_severity}, [{iso8601_timestamp}] {message}"
+    FORMAT_SHORT = "{short_severity}, [{iso8601_timestamp}] {message}\n"
 
     # DJB format using Tai64N labels
-    FORMAT_DJB = "{tai64n_timestamp} {severity}: {message}"
+    FORMAT_DJB = "{tai64n_timestamp} {severity}: {message}\n"
 
     ##
     # Implementation
