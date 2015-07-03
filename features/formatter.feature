@@ -36,3 +36,16 @@ Feature: Formatter
       # Note 1: need four \ to escape a special character in the regex field
       # Note 2: tests may fail in summer/winter time? the offset of +0200 is
       #         confusing.
+
+  @formatter_02
+  Scenario Outline: Format strings
+    Given I create a Formatter with the "<format>" format string
+    And I call it with parameters "<severity>", "<time>", "<progname>" and "<message>"
+    Then I expect the result to match "<result>"
+
+    Examples:
+      | format         | severity | time                     | progname | message      | result                                                                       |
+      | FORMAT_LOGGER  | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | I, \\\\[2015-07-03T12:10:57.000000 #\\\\d+\\\\] INFO -- STDOUT: test message |
+      | FORMAT_DEFAULT | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | I, \\\\[2015-07-03T12:10:57\\\\+0000 #\\\\d+\\\\] STDOUT: test message       |
+      | FORMAT_SHORT   | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | I, \\\\[2015-07-03T12:10:57\\\\+0000\\\\] test message                       |
+      | FORMAT_DJB     | INFO     | 2015-07-03T12:10:57Z     | STDOUT   | test message | @4000000055967bdb000001f4 INFO: test message                                 |
