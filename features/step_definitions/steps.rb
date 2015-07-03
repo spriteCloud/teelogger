@@ -45,9 +45,8 @@ Then(/^I expect this to ([^ ]*?) ?raise an exception$/) do |mod|
 end
 
 Then(/^I expect the log level to be "([^"]*)"$/) do |result|
-  puts logger.level
-  puts result
-  pending # Write code here that turns the phrase above into concrete actions
+  expected = TeeLogger::TeeLogger.convert_level(result.strip)
+  assert logger.level == [expected], "Expected numeric level #{expected} but got #{logger.level[0]}."
 end
 
 Then(/^I expect the log level "(.*?)" to (.*?) taken hold$/) do |level, condition|
