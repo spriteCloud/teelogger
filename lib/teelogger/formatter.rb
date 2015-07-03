@@ -24,11 +24,11 @@ module TeeLogger
       time.strftime("%Y-%m-%dT%H:%M:%S.") << "%06d" % time.usec
     end
 
-    def iso6801_timestamp(severity, time, progname, message)
+    def iso8601_timestamp(severity, time, progname, message)
       time.strftime("%Y-%m-%dT%H:%M:%S%z")
     end
 
-    def iso6801_timestamp_utc(severity, time, progname, message)
+    def iso8601_timestamp_utc(severity, time, progname, message)
       time.dup.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
     end
 
