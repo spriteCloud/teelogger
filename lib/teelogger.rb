@@ -8,6 +8,7 @@
 require "teelogger/version"
 require "teelogger/extensions"
 require "teelogger/levels"
+require "teelogger/formatter"
 
 require "logger"
 
@@ -40,6 +41,7 @@ module TeeLogger
 
     # Properties
     @default_level
+    @formatter
     @loggers
     @ios
 
@@ -89,6 +91,9 @@ public
         logger.level = convert_level(@default_level)
       end
 
+      # Set the logger formatter
+      logger.formatter = @formatter
+
       # Extend logger instances with extra functionality
       logger.extend(::TeeLogger::LoggerExtensions)
       logger.teelogger_io = io
@@ -114,6 +119,7 @@ public
 
       # Initialization
       @default_level = Logger::Severity::INFO
+      @formatter = ::TeeLogger::Formatter.new
       @loggers = {}
       @ios = {}
 
@@ -136,6 +142,19 @@ public
       # Set all loggers' log levels
       @loggers.each do |key, logger|
         logger.level = val
+      end
+    end
+
+
+    ##
+    # Set the formatter
+    def formatter=(formatter)
+      # Update the default formatter
+      @formatter = formatter
+
+      # Set all loggers' formatters
+      @loggers.each do |key, logger|
+        logger.formatter = formatter
       end
     end
 
