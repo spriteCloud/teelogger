@@ -72,7 +72,7 @@ module TeeLogger
     FORMAT_DEFAULT = "{short_severity}, [{iso8601_timestamp} \#{pid}] {logger}: {message}"
 
     # Shorter format string
-    FORMAT_SHORT = "{short_severity}, [{iso8601_timestamp}]: {message}"
+    FORMAT_SHORT = "{short_severity}, [{iso8601_timestamp}] {message}"
 
     # DJB format using Tai64N labels
     FORMAT_DJB = "{tai64n_timestamp} {severity}: {message}"
