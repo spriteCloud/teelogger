@@ -1,10 +1,11 @@
 require "codeclimate-test-reporter"
 CodeClimate::TestReporter.start
 
-begin
-  require 'test/unit/assertions'
-rescue LoadError
-  require 'minitest/assertions'
+# Simple assert function
+def assert(condition, message = "Unknown reason")
+  if not condition
+    raise message
+  end
 end
 
 require "teelogger"
