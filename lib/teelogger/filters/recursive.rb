@@ -40,13 +40,15 @@ module TeeLogger
               end
 
               if not redacted
-                ::TeeLogger::Filter.apply_filters_internal(run_data, *expanded[1..-1])
+                arg[key] = ::TeeLogger::Filter.apply_filters_internal(run_data, *expanded[1..-1])
               end
             else
-              ::TeeLogger::Filter.apply_filters_internal(run_data, expanded)
+              arg = ::TeeLogger::Filter.apply_filters_internal(run_data, expanded)
             end
           end
         end
+
+        return args
       end
     end # class Recursive
   end # module Filter

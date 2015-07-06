@@ -34,6 +34,8 @@ module TeeLogger
             arg.gsub!(match, '\1[REDACTED]')
           end
         end
+
+        return args
       end
     end # class Assignment
   end # module Filter

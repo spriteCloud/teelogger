@@ -260,7 +260,7 @@ public
 
     def dispatch_log(meth_name, *args)
       # Filter all arguments
-      ::TeeLogger::Filter.apply_filters(*args)
+      args = ::TeeLogger::Filter.apply_filters(*args)
 
       # Compose message
       msg = args.map do |arg|

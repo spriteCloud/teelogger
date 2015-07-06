@@ -116,7 +116,7 @@ module TeeLogger
         :words => words,
         :filter_cache => filter_cache,
       }
-      self.apply_filters_internal(state, *args)
+      return self.apply_filters_internal(state, *args)
     end
 
 
@@ -124,9 +124,12 @@ module TeeLogger
     # Implementation of apply_filters that doesn't initialize state, but carries
     # it over. Used internally only.
     def self.apply_filters_internal(state, *args)
+      filtered_args = []
+
       # Iterate through filters
       self.registered_filters.each do |window, window_filters|
         window = [window, args.size].min
+
         args.each_cons(window) do |arg_tuple|
           # We need to use *one* argument to determine whether the filter
           # type applies. The current strategy is to match the first argument
@@ -150,11 +153,14 @@ module TeeLogger
                 state[:filter_cache][filter] = filter_instance
               end
 
-              filter_instance.process(*arg_tuple)
+              arg_tuple = filter_instance.process(*arg_tuple)
             end
           end
+          filtered_args << arg_tuple
         end
       end
+
+      return filtered_args
     end
 
 
