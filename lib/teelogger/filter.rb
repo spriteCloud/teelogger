@@ -163,13 +163,17 @@ module TeeLogger
 
               # Single item windows need to be processed a bit differently from
               # multi-item windows.
-              puts "++ BEFORE: #{filtered_args}"
               tuple = filtered_args[idx..idx + window_size - 1]
               filtered = filter_instance.process(*tuple)
+
+              # Sanity check result
+              if filtered.size != tuple.size
+                raise "Filter #{filter} added or removed items to the log; don't know how to process!"
+              end
+
               filtered.each_with_index do |item, offset|
                 filtered_args[idx + offset] = item
               end
-              puts "++ AFTER: #{filtered_args}"
             end # type_filters.each
           end # window_filters.each
 
