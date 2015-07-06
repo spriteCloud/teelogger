@@ -31,7 +31,9 @@ Given(/^I write a log message containing the value "([^"]*)" for the key "([^"]*
   logger.error(val)
 end
 
-
+Given(/^I set filter words to include "([^"]*)"$/) do |filter_word|
+  TeeLogger::Filter.filter_words = [filter_word]
+end
 
 Then(/^I expect the log message to ([^ ]* ?)contain the word "([^"]*)"$/) do |mod, word|
   mod = mod.strip
