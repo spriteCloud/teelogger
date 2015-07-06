@@ -48,6 +48,10 @@ Given(/^I register a custom filter$/) do
   TeeLogger::Filter.register_filter(MyFilter)
 end
 
+Given(/^I write a log message containing the word sequence "([^"]*)", "([^"]*)"$/) do |word1, word2|
+  logger.error(word1, word2)
+end
+
 Then(/^I expect the log message to ([^ ]* ?)contain the word "([^"]*)"$/) do |mod, word|
   mod = mod.strip
   message = io.string

@@ -47,6 +47,17 @@ Feature: Filter
       | hello    | MUST REMAIN  | contain     |
       | password | TO BE HIDDEN | not contain |
 
+  @filter_04
+  Scenario Outline: Replace patterns in CLI-like arrays
+    Given I create a TeeLogger for testing filters
+    And I write a log message containing the word sequence "<word1>", "<word2>"
+    Then I expect the log message to <condition> the word "<word2>"
+
+    Examples:
+      | word1    | word2        | condition   |
+      | hello    | MUST REMAIN  | contain     |
+      | password | TO BE HIDDEN | not contain |
+
   @filter_05
   Scenario Outline: Ensure custom filter words work
     Given I create a TeeLogger for testing filters
@@ -67,6 +78,3 @@ Feature: Filter
     And I register a custom filter
     And I write a log message containing the word "foo"
     Then I expect the log message to not contain the word "foo"
-
-# TODO filter CLI style
-# TODO use custom filter
