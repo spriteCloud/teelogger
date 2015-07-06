@@ -125,7 +125,8 @@ public
       @loggers = {}
       @ios = {}
 
-      ::TeeLogger::Filter.load_filters(*args)
+      # Load built-in filters
+      load_filters(*args)
 
       # Create logs for all arguments
       args.each do |arg|
@@ -225,6 +226,7 @@ public
     end
 
     def method_missing(meth, *args, &block)
+      puts "MISSING #{meth}"
       dispatch(meth, *args, &block)
     end
 
@@ -260,7 +262,7 @@ public
 
     def dispatch_log(meth_name, *args)
       # Filter all arguments
-      args = ::TeeLogger::Filter.apply_filters(*args)
+      args = apply_filters(*args)
 
       # Compose message
       msg = args.map do |arg|

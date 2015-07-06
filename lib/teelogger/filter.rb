@@ -22,19 +22,19 @@ module TeeLogger
 
     ##
     # Filter words
-    def self.filter_words
-      @@filter_words ||= DEFAULT_FILTER_WORDS
-      return @@filter_words
+    def filter_words
+      @filter_words ||= DEFAULT_FILTER_WORDS
+      return @filter_words
     end
 
-    def self.filter_words=(arg)
+    def filter_words=(arg)
       # Coerce into array
       begin
         arr = []
         arg.each do |item|
           arr << item
         end
-        @@filter_words = arr
+        @filter_words = arr
       rescue NameError, NoMethodError
         raise "Can't set filter words, not iterable: #{arg}"
       end
@@ -43,13 +43,13 @@ module TeeLogger
 
     ##
     # Load all built-in filters.
-    def self.load_filters(*args)
+    def load_filters(*args)
       require_rel 'filters'
-      constants.collect {|const_sym|
-        const_get(const_sym)
+      ::TeeLogger::Filter.constants.collect {|const_sym|
+        ::TeeLogger::Filter.const_get(const_sym)
       }.each do |filter|
         begin
-          self.register_filter(filter)
+          register_filter(filter)
           if not ENV['TEELOGGER_VERBOSE'].nil? and ENV['TEELOGGER_VERBOSE'].to_i > 0
             puts "Registered filter #{filter}."
           end
@@ -63,15 +63,15 @@ module TeeLogger
 
     ##
     # Returns all registered filters.
-    def self.registered_filters
+    def registered_filters
       # Initialize if it doesn't exist
-      @@filters ||= {}
-      return @@filters
+      @filters ||= {}
+      return @filters
     end
 
     ##
     # Expects a class, registers the class for use by the filter function
-    def self.register_filter(filter)
+    def register_filter(filter)
       # Sanity checks/register filter
       if filter.class != Class
         raise "Ignoring '#{filter}', not a class."
@@ -83,7 +83,7 @@ module TeeLogger
 
       begin
         window = filter::WINDOW_SIZE.to_i
-        window_filters = self.registered_filters.fetch(window, {})
+        window_filters = registered_filters.fetch(window, {})
 
         filter::FILTER_TYPES.each do |type|
           type_filters = window_filters.fetch(type, [])
@@ -91,7 +91,7 @@ module TeeLogger
           window_filters[type] = type_filters
         end
 
-        self.registered_filters[window] = window_filters
+        registered_filters[window] = window_filters
       rescue NameError, NoMethodError
         raise "Class '#{filter}' is missing a FILTER_TYPES Array or a WINDOW_SIZE Integer."
       end
@@ -99,10 +99,10 @@ module TeeLogger
 
     ##
     # Applies all registered filters.
-    def self.apply_filters(*args)
+    def apply_filters(*args)
       # Pre-process filter words: we need to have regular expressions everywhere
       words = []
-      self.filter_words.each do |word|
+      filter_words.each do |word|
         if word.is_a? Regexp
           words << word
         else
@@ -118,19 +118,20 @@ module TeeLogger
       state = {
         :words => words,
         :filter_cache => filter_cache,
+        :filters => self,
       }
-      return self.apply_filters_internal(state, *args)
+      return apply_filters_internal(state, *args)
     end
 
 
     ##
     # Implementation of apply_filters that doesn't initialize state, but carries
     # it over. Used internally only.
-    def self.apply_filters_internal(state, *args)
+    def apply_filters_internal(state, *args)
       filtered_args = args
 
       # Iterate through filters
-      self.registered_filters.each do |window, window_filters|
+      registered_filters.each do |window, window_filters|
         # Determine actual window size
         window_size = [window, filtered_args.size].min
 
@@ -162,11 +163,13 @@ module TeeLogger
 
               # Single item windows need to be processed a bit differently from
               # multi-item windows.
+              puts "++ BEFORE: #{filtered_args}"
               tuple = filtered_args[idx..idx + window_size - 1]
               filtered = filter_instance.process(*tuple)
               filtered.each_with_index do |item, offset|
                 filtered_args[idx + offset] = item
               end
+              puts "++ AFTER: #{filtered_args}"
             end # type_filters.each
           end # window_filters.each
 

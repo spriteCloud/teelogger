@@ -40,10 +40,10 @@ module TeeLogger
               end
 
               if not redacted
-                arg[key] = ::TeeLogger::Filter.apply_filters_internal(run_data, *expanded[1..-1])
+                arg[key] = run_data[:filters].apply_filters_internal(run_data, *expanded[1..-1])
               end
             else
-              arg = ::TeeLogger::Filter.apply_filters_internal(run_data, expanded)
+              arg = run_data[:filters].apply_filters_internal(run_data, expanded)
             end
           end
         end
