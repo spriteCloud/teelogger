@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest"
 
   spec.add_dependency "tai64", "~> 0.0"
+  spec.add_dependency "require_all", "~> 1.3"
 end
