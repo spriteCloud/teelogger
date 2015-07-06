@@ -50,6 +50,9 @@ module TeeLogger
       }.each do |filter|
         begin
           self.register_filter(filter)
+          if not ENV['TEELOGGER_VERBOSE'].nil? and ENV['TEELOGGER_VERBOSE'].to_i > 0
+            puts "Registered filter #{filter}."
+          end
         rescue StandardError => err
           if not ENV['TEELOGGER_VERBOSE'].nil? and ENV['TEELOGGER_VERBOSE'].to_i > 0
             puts "Not registering filter: #{err}"
@@ -124,17 +127,21 @@ module TeeLogger
     # Implementation of apply_filters that doesn't initialize state, but carries
     # it over. Used internally only.
     def self.apply_filters_internal(state, *args)
-      filtered_args = []
+      filtered_args = args
 
       # Iterate through filters
       self.registered_filters.each do |window, window_filters|
-        window = [window, args.size].min
+        # Determine actual window size
+        window_size = [window, filtered_args.size].min
 
-        args.each_cons(window) do |arg_tuple|
+        # Process each window so that elements are updated in-place. This
+        # means we'll start at index 0 and process up to window_size elements.
+        idx = 0
+        while (idx + window_size - 1) < filtered_args.size
           # We need to use *one* argument to determine whether the filter
           # type applies. The current strategy is to match the first argument
           # only, and let the filter cast to other types if necessary.
-          first_arg = arg_tuple[0]
+          first_arg = filtered_args[idx]
 
           window_filters.each do |class_match, type_filters|
             # We process with these type filters if first_arg matches the
@@ -153,12 +160,20 @@ module TeeLogger
                 state[:filter_cache][filter] = filter_instance
               end
 
-              arg_tuple = filter_instance.process(*arg_tuple)
-            end
-          end
-          filtered_args << arg_tuple
-        end
-      end
+              # Single item windows need to be processed a bit differently from
+              # multi-item windows.
+              tuple = filtered_args[idx..idx + window_size - 1]
+              filtered = filter_instance.process(*tuple)
+              filtered.each_with_index do |item, offset|
+                filtered_args[idx + offset] = item
+              end
+            end # type_filters.each
+          end # window_filters.each
+
+          # Advance to the next window
+          idx += 1
+        end # each window
+      end # all registered filters
 
       return filtered_args
     end
