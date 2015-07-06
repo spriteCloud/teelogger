@@ -27,6 +27,12 @@ module TeeLogger
       end
 
       def process(*args)
+        # In case the window is too small, ignore it
+        if args.size < 2
+          return args
+        end
+
+        # Otherwise, if the first argument matches, we'll redact the second.
         @matches.each do |word|
           if word.match(args[0])
             args[1] = '[REDACTED]'
