@@ -37,8 +37,6 @@ Then(/^I expect the log message to ([^ ]* ?)contain the word "([^"]*)"$/) do |mo
   mod = mod.strip
   message = io.string
 
-  puts ">#{message}<"
-
   case mod
   when "not"
     assert !message.include?(word), "Log message contains '#{word}' when it must not!"
