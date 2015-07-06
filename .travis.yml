@@ -12,9 +12,6 @@ rvm:
   - 2.1.0
   - 2.2.2
   - jruby
-matrix:
-  allow_failures:
-    rvm: 2.2.2
 env:
   CODECLIMATE_REPO_TOKEN=e37a93224a40c36fd6a24465c063e7627661921a868a2d1321ad2937d7889de6
 notifications:
