@@ -47,8 +47,8 @@ Feature: Filter
       | hello    | MUST REMAIN  | contain     |
       | password | TO BE HIDDEN | not contain |
 
-   @filter_05
-   Scenario Outline: Ensure custom filter words work
+  @filter_05
+  Scenario Outline: Ensure custom filter words work
     Given I create a TeeLogger for testing filters
     And I set filter words to include "<filter>"
     And I write a log message containing the word "<word>"
@@ -60,6 +60,13 @@ Feature: Filter
       | bar    | foo=123 | contain     |
       | foo    | bar=123 | contain     |
       | bar    | bar=123 | not contain |
+
+  @filter_06
+  Scenario: Custom filter
+    Given I create a TeeLogger for testing filters
+    And I register a custom filter
+    And I write a log message containing the word "foo"
+    Then I expect the log message to not contain the word "foo"
 
 # TODO filter CLI style
 # TODO use custom filter

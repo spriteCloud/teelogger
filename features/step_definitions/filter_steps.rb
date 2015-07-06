@@ -35,15 +35,28 @@ Given(/^I set filter words to include "([^"]*)"$/) do |filter_word|
   TeeLogger::Filter.filter_words = [filter_word]
 end
 
+Given(/^I register a custom filter$/) do
+  class MyFilter < TeeLogger::Filter::FilterBase
+    FILTER_TYPES = [String]
+    WINDOW_SIZE  = 1
+    def process(*args)
+      # Eat all arguments
+      return []
+    end
+  end
+
+  TeeLogger::Filter.register_filter(MyFilter)
+end
+
 Then(/^I expect the log message to ([^ ]* ?)contain the word "([^"]*)"$/) do |mod, word|
   mod = mod.strip
   message = io.string
 
   case mod
   when "not"
-    assert !message.include?(word), "Log message contains '#{word}' when it must not!"
+    assert !message.include?(word), "Log message contains '#{word}' when it must not!:\n#{message}"
   else
-    assert message.include?(word), "Log message does not contain '#{word}' when it should!"
+    assert message.include?(word), "Log message does not contain '#{word}' when it should!:\n#{message}"
   end
 end
 
