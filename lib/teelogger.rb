@@ -9,6 +9,7 @@ require "teelogger/version"
 require "teelogger/extensions"
 require "teelogger/levels"
 require "teelogger/formatter"
+require "teelogger/filter"
 
 require "logger"
 
@@ -38,6 +39,7 @@ module TeeLogger
     # Extends and includes
     extend  ::TeeLogger::Levels
     include ::TeeLogger::Levels
+    include ::TeeLogger::Filter
 
     # Properties
     @default_level
@@ -122,6 +124,8 @@ public
       @formatter = ::TeeLogger::Formatter.new
       @loggers = {}
       @ios = {}
+
+      ::TeeLogger::Filter.load_filters(*args)
 
       # Create logs for all arguments
       args.each do |arg|
@@ -255,6 +259,9 @@ public
 
 
     def dispatch_log(meth_name, *args)
+      # Filter all arguments
+      ::TeeLogger::Filter.apply_filters(*args)
+
       # Compose message
       msg = args.map do |arg|
         if arg.is_a? String
