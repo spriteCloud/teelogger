@@ -32,7 +32,7 @@ Given(/^I write a log message containing the value "([^"]*)" for the key "([^"]*
 end
 
 Given(/^I set filter words to include "([^"]*)"$/) do |filter_word|
-  TeeLogger::Filter.filter_words = [filter_word]
+  logger.filter_words = [filter_word]
 end
 
 Given(/^I register a custom filter$/) do
@@ -40,12 +40,15 @@ Given(/^I register a custom filter$/) do
     FILTER_TYPES = [String]
     WINDOW_SIZE  = 1
     def process(*args)
-      # Eat all arguments
-      return []
+      # Nil everything
+      args.each_with_index do |dummy, idx|
+        args[idx] = nil
+      end
+      return args
     end
   end
 
-  TeeLogger::Filter.register_filter(MyFilter)
+  logger.register_filter(MyFilter)
 end
 
 Given(/^I write a log message containing the word sequence "([^"]*)", "([^"]*)"$/) do |word1, word2|
