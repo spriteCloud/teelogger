@@ -226,7 +226,6 @@ public
     end
 
     def method_missing(meth, *args, &block)
-      puts "MISSING #{meth}"
       dispatch(meth, *args, &block)
     end
 
