@@ -1,5 +1,6 @@
 io = nil
 logger = nil
+error = nil
 
 Given(/^I create a TeeLogger for regression testing issues$/) do
   io = StringIO.new
@@ -21,9 +22,15 @@ Given(/^I log complex data$/) do
       ],
     },
   }
-  logger.error(data)
+
+  begin
+    logger.error(data)
+    error = nil
+  rescue StandardError => err
+    error = err
+  end
 end
 
 Then(/^I expect there not to be an exception$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  assert error.nil?, "Expected no error, but got: #{error}"
 end
