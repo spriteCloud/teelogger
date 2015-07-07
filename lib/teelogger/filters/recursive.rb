@@ -36,7 +36,7 @@ module TeeLogger
               redacted = false
               run_data[:words].each do |word|
                 if word.match(key.to_s)
-                   processed[key] = '[REDACTED]'
+                   processed[key] = ::TeeLogger::Filter::REDACTED_WORD
                    redacted = true
                    break
                 end

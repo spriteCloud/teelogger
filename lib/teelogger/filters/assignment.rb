@@ -31,7 +31,7 @@ module TeeLogger
         args.each do |arg|
           @matches.each do |match|
             # Modify the matching arguments in place
-            arg.gsub!(match, '\1[REDACTED]')
+            arg.gsub!(match, "\1#{::TeeLogger::Filter::REDACTED_WORD}")
           end
         end
 

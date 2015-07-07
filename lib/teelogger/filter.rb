@@ -21,6 +21,10 @@ module TeeLogger
     ]
 
     ##
+    # Word to use in place of original values
+    REDACTED_WORD = "[REDACTED]"
+
+    ##
     # Filter words
     def filter_words
       @filter_words ||= DEFAULT_FILTER_WORDS

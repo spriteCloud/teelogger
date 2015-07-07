@@ -35,7 +35,7 @@ module TeeLogger
         # Otherwise, if the first argument matches, we'll redact the second.
         @matches.each do |word|
           if word.match(args[0])
-            args[1] = '[REDACTED]'
+            args[1] = ::TeeLogger::Filter::REDACTED_WORD
           end
         end
         return args
