@@ -20,35 +20,42 @@ module TeeLogger
         # For each argument, recurse processing. Note that due to the window
         # size of one, args is only an element long - but let's write this out
         # properly.
+        processed_args = []
+
         args.each do |arg|
-          # Since we're matching enumerabls, the argument must respond to .each
-          arg.each do |expanded|
-            # The expanded variable can be a single item or a list of items.
-            # If expanded is itself an Enumarable, the first item is a key, the remainder
-            # values. We need to recursively process the values.
-            if expanded.is_a? Enumerable
-              # If the key matches any of the filter words, we'll just skip
-              # the value entirely.
-              key = expanded[0]
+          # So we have an Enumerable, but we don't know whether it's Array-like
+          # or Hash-like. We'll check whether it responds to ".keys", and then
+          # treat it as a Hash.
+          processed = nil
+          if arg.respond_to? :keys
+            processed = {}
+            # Looks like a Hash, treat it like a Hash
+            arg.each do |key, value|
+
+              # If the key is a match, we'll just redact the entire value.
               redacted = false
               run_data[:words].each do |word|
                 if word.match(key.to_s)
-                  arg[key] = '[REDACTED]'
-                  redacted = true
-                  break
+                   processed[key] = '[REDACTED]'
+                   redacted = true
+                   break
                 end
               end
 
+              # Otherwise, pass it through
               if not redacted
-                arg[key] = run_data[:filters].apply_filters_internal(run_data, *expanded[1..-1])
+                processed[key] = run_data[:filters].apply_filters_internal(run_data, value)[0]
               end
-            else
-              arg = run_data[:filters].apply_filters_internal(run_data, expanded)
             end
+          else
+            # Treat it like an Array
+            processed = run_data[:filters].apply_filters_internal(run_data, *arg)
           end
+
+          processed_args << processed
         end
 
-        return args
+        return processed_args
       end
     end # class Recursive
   end # module Filter
