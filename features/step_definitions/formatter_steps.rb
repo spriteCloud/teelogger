@@ -17,7 +17,7 @@ Given(/^I call it with parameters "([^"]*)", "([^"]*)", "([^"]*)" and "([^"]*)"$
   # machines.
   zone = ENV["TZ"]
   ENV["TZ"] = "UTC"
-  t = Time.parse(time)
+  t = Time.parse(time).localtime
   ENV["TZ"] = zone
 
   result = formatter.call(severity, t, progname, message)
