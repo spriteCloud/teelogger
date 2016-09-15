@@ -22,8 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "rubocop", "~> 0.42"
   spec.add_development_dependency "rake", "~> 11.1"
-  spec.add_development_dependency "rspec", "~> 3.5"
-  spec.add_development_dependency "rspec-mocks", "~> 3.5"
+  spec.add_development_dependency "cucumber", "~> 2"
   spec.add_development_dependency "simplecov", "~> 0.12"
 
   spec.add_dependency "tai64", "~> 0.0"
