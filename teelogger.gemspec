@@ -21,8 +21,6 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.required_ruby_version = '>= 2.2'
-
   spec.add_development_dependency "rubocop", "~> 0.42"
   spec.add_development_dependency "rake", "~> 11.1"
   spec.add_development_dependency "cucumber", "~> 2"
