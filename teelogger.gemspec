@@ -18,9 +18,13 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.6"
-  spec.add_development_dependency "rake", "~> 0"
-  spec.add_development_dependency "cucumber", "~> 0"
+  spec.required_ruby_version = '>= 2.2'
+
+  spec.add_development_dependency "rubocop", "~> 0.42"
+  spec.add_development_dependency "rake", "~> 11.1"
+  spec.add_development_dependency "rspec", "~> 3.5"
+  spec.add_development_dependency "rspec-mocks", "~> 3.5"
+  spec.add_development_dependency "simplecov", "~> 0.12"
 
   spec.add_dependency "tai64", "~> 0.0"
   spec.add_dependency "require_all", "~> 1.3"
