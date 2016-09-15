@@ -20,13 +20,14 @@ module TeeLogger
       end
 
       @teelogger_io.flush
+      # rubocop:disable Lint/HandleExceptions
       begin
         @teelogger_io.fsync
       rescue NotImplementedError, Errno::EINVAL
         # pass
       end
+      # rubocop:enable Lint/HandleExceptions
     end
-
 
     ##
     # This function invokes flush if it's been invoked more often than
@@ -38,10 +39,12 @@ module TeeLogger
 
       @written += 1
 
-      if @written >= self.flush_interval
-        self.flush
-        @written = 0
+      if @written < flush_interval
+        return
       end
+
+      flush
+      @written = 0
     end
   end # module LoggerExtensions
 end # module TeeLogger

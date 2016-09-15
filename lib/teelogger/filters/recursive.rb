@@ -13,7 +13,7 @@ module TeeLogger
     # The Recursive filter takes Hashes or Arrays, and recursively applies the
     # other filters to their values.
     class Recursive < FilterBase
-      FILTER_TYPES = [Enumerable]
+      FILTER_TYPES = [Enumerable].freeze
       WINDOW_SIZE  = 1
 
       def process(*args)
@@ -31,21 +31,25 @@ module TeeLogger
             processed = {}
             # Looks like a Hash, treat it like a Hash
             arg.each do |key, value|
-
               # If the key is a match, we'll just redact the entire value.
               redacted = false
               run_data[:words].each do |word|
-                if word.match(key.to_s)
-                   processed[key] = ::TeeLogger::Filter::REDACTED_WORD
-                   redacted = true
-                   break
+                if not word.match(key.to_s)
+                  next
                 end
+
+                processed[key] = ::TeeLogger::Filter::REDACTED_WORD
+                redacted = true
+                break
               end
 
               # Otherwise, pass it through
-              if not redacted
-                processed[key] = run_data[:filters].apply_filters_internal(run_data, value)[0]
+              if redacted
+                next
               end
+              processed[key] = run_data[:filters].apply_filters_internal(
+                  run_data, value
+              )[0]
             end
           else
             # Treat it like an Array
