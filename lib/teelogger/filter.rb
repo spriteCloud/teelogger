@@ -8,6 +8,8 @@
 require 'require_all'
 
 module TeeLogger
+  ##
+  # The Filter module collects filtering elated TeeLogger functionality.
   module Filter
     ##
     # The default words to filter. It's up to each individual filter to decide
@@ -18,11 +20,11 @@ module TeeLogger
     DEFAULT_FILTER_WORDS = [
       /password[a-z\-_]*/,
       /salt[a-z\-_]*/,
-    ]
+    ].freeze
 
     ##
     # Word to use in place of original values
-    REDACTED_WORD = "[REDACTED]"
+    REDACTED_WORD = "[REDACTED]".freeze
 
     ##
     # Filter words
@@ -33,32 +35,31 @@ module TeeLogger
 
     def filter_words=(arg)
       # Coerce into array
-      begin
-        arr = []
-        arg.each do |item|
-          arr << item
-        end
-        @filter_words = arr
-      rescue NameError, NoMethodError
-        raise "Can't set filter words, not iterable: #{arg}"
+      arr = []
+      arg.each do |item|
+        arr << item
       end
+      @filter_words = arr
+    rescue NameError # also NoMethodError
+      raise "Can't set filter words, not iterable: #{arg}"
     end
-
 
     ##
     # Load all built-in filters.
-    def load_filters(*args)
+    def load_filters(*_)
       require_rel 'filters'
-      ::TeeLogger::Filter.constants.collect {|const_sym|
+      collected = ::TeeLogger::Filter.constants.collect do |const_sym|
         ::TeeLogger::Filter.const_get(const_sym)
-      }.each do |filter|
+      end
+      collected.each do |filter|
+        verbose = (ENV['TEELOGGER_VERBOSE'] || 0).to_i
         begin
           register_filter(filter)
-          if not ENV['TEELOGGER_VERBOSE'].nil? and ENV['TEELOGGER_VERBOSE'].to_i > 0
+          if verbose > 0
             puts "Registered filter #{filter}."
           end
         rescue StandardError => err
-          if not ENV['TEELOGGER_VERBOSE'].nil? and ENV['TEELOGGER_VERBOSE'].to_i > 0
+          if verbose > 0
             puts "Not registering filter: #{err}"
           end
         end
@@ -96,8 +97,9 @@ module TeeLogger
         end
 
         registered_filters[window] = window_filters
-      rescue NameError, NoMethodError
-        raise "Class '#{filter}' is missing a FILTER_TYPES Array or a WINDOW_SIZE Integer."
+      rescue NameError # also catches NoMethodError
+        raise "Class '#{filter}' is missing a FILTER_TYPES Array or a "\
+          "WINDOW_SIZE Integer."
       end
     end
 
@@ -120,13 +122,12 @@ module TeeLogger
 
       # Pass state on to apply_filters_internal
       state = {
-        :words => words,
-        :filter_cache => filter_cache,
-        :filters => self,
+        words: words,
+        filter_cache: filter_cache,
+        filters: self,
       }
       return apply_filters_internal(state, *args)
     end
-
 
     ##
     # Implementation of apply_filters that doesn't initialize state, but carries
@@ -172,7 +173,8 @@ module TeeLogger
 
               # Sanity check result
               if filtered.size != tuple.size
-                raise "Filter #{filter} added or removed items to the log; don't know how to process!"
+                raise "Filter #{filter} added or removed items to the log; "\
+                  "don't know how to process!"
               end
 
               filtered.each_with_index do |item, offset|
@@ -188,7 +190,6 @@ module TeeLogger
 
       return filtered_args
     end
-
 
     ##
     # Any filter implementations must derive from this
@@ -213,7 +214,6 @@ module TeeLogger
       def process(*args)
         args
       end
-
     end # class FilterBase
   end # end module Filter
 end # end module TeeLogger

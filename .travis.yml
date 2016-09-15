@@ -1,13 +1,13 @@
 install:
   - "bundle install"
 script:
-  - "bundle exec cucumber"
+  - "bundle exec rake"
 os:
   - linux
   - osx
 language: ruby
 rvm:
-  - 1.9.3  
+  - 1.9.3
   - 2.0.0
   - 2.1.0
   - 2.2.2

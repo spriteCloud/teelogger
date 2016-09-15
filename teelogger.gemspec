@@ -8,8 +8,11 @@ Gem::Specification.new do |spec|
   spec.version       = TeeLogger::VERSION
   spec.authors       = ["Jens Finkhaeuser"]
   spec.email         = ["foss@spritecloud.com"]
-  spec.summary       = %q{Mini wrapper around Ruby Logger for logging to multiple destinations.}
-  spec.description   = %q{Mini wrapper around Ruby Logger for logging to multiple destinations.}
+  spec.summary       = "Mini wrapper around Ruby Logger for logging to "\
+                       "multiple destinations."
+  spec.description   = "Mini wrapper around Ruby Logger for logging to "\
+                       "multiple destinations. Adds filtering and other "\
+                       "extensions."
   spec.homepage      = "https://github.com/spriteCloud/teelogger"
   spec.license       = "MITNFA"
 
@@ -18,9 +21,10 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.6"
-  spec.add_development_dependency "rake", "~> 0"
-  spec.add_development_dependency "cucumber", "~> 0"
+  spec.add_development_dependency "rubocop", "~> 0.42"
+  spec.add_development_dependency "rake", "~> 11.1"
+  spec.add_development_dependency "cucumber", "~> 2"
+  spec.add_development_dependency "simplecov", "~> 0.12"
 
   spec.add_dependency "tai64", "~> 0.0"
   spec.add_dependency "require_all", "~> 1.3"

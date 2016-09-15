@@ -12,43 +12,48 @@ module TeeLogger
   # Placeholders for the formatter take a single argument, and convert it to
   # a string argument using placeholder specific rules.
   module FormatterPlaceholders
-    def severity(severity, time, progname, message)
+    def severity(severity, _, _, _)
       severity.to_s.upcase
     end
 
-    def short_severity(severity, time, progname, message)
+    def short_severity(severity, _, _, _)
       severity.to_s.upcase[0..0]
     end
 
-    def logger_timestamp(severity, time, progname, message)
+    def logger_timestamp(_, time, _, _)
+      # rubocop:disable Style/FormatString
       time.strftime("%Y-%m-%dT%H:%M:%S.") << "%06d" % time.usec
+      # rubocop:enable Style/FormatString
     end
 
-    def iso8601_timestamp(severity, time, progname, message)
+    def iso8601_timestamp(_, time, _, _)
       time.strftime("%Y-%m-%dT%H:%M:%S%z")
     end
 
-    def iso8601_timestamp_utc(severity, time, progname, message)
+    def iso8601_timestamp_utc(_, time, _, _)
       time.dup.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
     end
 
-    def tai64n_timestamp(severity, time, progname, message)
+    def tai64n_timestamp(_, time, _, _)
       Tai64::Time.new(time).to_label.to_s
     end
 
-    def logger(severity, time, progname, message)
+    def logger(_, _, progname, _)
       progname.to_s
     end
 
-    def message(severity, time, progname, message)
+    def message(_, _, _, message)
       message.to_s
     end
 
-    def pid(severity, time, progname, message)
-      $$.to_s
+    def pid(_, _, _, _)
+      require "English"
+      $PID.to_s
     end
 
+    # rubocop:disable Style/ModuleFunction
     extend self
+    # rubocop:enable Style/ModuleFunction
   end # module FormatterPlaceholders
 
   ##
@@ -66,16 +71,18 @@ module TeeLogger
     # Some format strings defined
 
     # Format string most similar to the Ruby logger
-    FORMAT_LOGGER = "{short_severity}, [{logger_timestamp} \#{pid}] {severity} -- {logger}: {message}\n"
+    FORMAT_LOGGER = "{short_severity}, [{logger_timestamp} \#{pid}] "\
+        "{severity} -- {logger}: {message}\n".freeze
 
     # Default format string
-    FORMAT_DEFAULT = "{short_severity}, [{iso8601_timestamp} \#{pid}] {logger}: {message}\n"
+    FORMAT_DEFAULT = "{short_severity}, [{iso8601_timestamp} \#{pid}] "\
+        "{logger}: {message}\n".freeze
 
     # Shorter format string
-    FORMAT_SHORT = "{short_severity}, [{iso8601_timestamp}] {message}\n"
+    FORMAT_SHORT = "{short_severity}, [{iso8601_timestamp}] {message}\n".freeze
 
     # DJB format using Tai64N labels
-    FORMAT_DJB = "{tai64n_timestamp} {severity}: {message}\n"
+    FORMAT_DJB = "{tai64n_timestamp} {severity}: {message}\n".freeze
 
     ##
     # Implementation
@@ -92,11 +99,16 @@ module TeeLogger
       PLACEHOLDERS.each do |placeholder|
         value = nil
         begin
-          value = cache.fetch(placeholder,
-                ::TeeLogger::FormatterPlaceholders.send(placeholder.to_sym, *args))
+          value = cache.fetch(
+              placeholder,
+              ::TeeLogger::FormatterPlaceholders.send(
+                  placeholder.to_sym, *args
+              )
+          )
           cache[placeholder] = value
         rescue NoMethodError
-          raise "Invalid formatter placeholder used in format string: #{placeholder}"
+          raise "Invalid formatter placeholder used in format string: "\
+              "#{placeholder}"
         end
 
         message.gsub!(/{#{placeholder}}/, value)

@@ -13,7 +13,7 @@ module TeeLogger
     # The Assignment filter takes strings of the form <prefix><word>=<value> and
     # obfuscates the value.
     class Assignment < FilterBase
-      FILTER_TYPES = [String]
+      FILTER_TYPES = [String].freeze
       WINDOW_SIZE  = 1
 
       def initialize(*args)

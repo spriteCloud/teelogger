@@ -13,7 +13,7 @@ module TeeLogger
     # The CLI filter takes sequences of strings of the form ["word", "value"]
     # and obfuscates the value if the word matches.
     class CLI < FilterBase
-      FILTER_TYPES = [String]
+      FILTER_TYPES = [String].freeze
       WINDOW_SIZE  = 2
 
       def initialize(*args)

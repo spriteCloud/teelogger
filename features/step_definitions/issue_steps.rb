@@ -5,7 +5,8 @@ error = nil
 Given(/^I create a TeeLogger for regression testing issues$/) do
   io = StringIO.new
   logger = TeeLogger::TeeLogger.new io
-  assert [TeeLogger::DEFAULT_FLUSH_INTERVAL] == logger.flush_interval, "Flush interval is not default: #{logger.flush_interval}"
+  assert [TeeLogger::DEFAULT_FLUSH_INTERVAL] == logger.flush_interval,
+         "Flush interval is not default: #{logger.flush_interval}"
 end
 
 Given(/^I log complex data$/) do
