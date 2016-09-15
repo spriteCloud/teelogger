@@ -7,7 +7,7 @@ Feature: Filter
   @filter_01
   Scenario Outline: Replace patterns in Strings
     Given I create a TeeLogger for testing filters
-    And I write a log message containing the word "<word>"
+    And I write a log message with the word "<word>"
     Then I expect the log message to <condition> the word "<word>"
 
     Examples:
@@ -23,7 +23,7 @@ Feature: Filter
   @filter_02
   Scenario Outline: Replace patterns in Strings in Arrays
     Given I create a TeeLogger for testing filters
-    And I write a log message containing the word "<word>" in an Array
+    And I write a log message with the word "<word>" in an Array
     Then I expect the log message to <condition> the word "<word>"
 
     Examples:
@@ -39,7 +39,7 @@ Feature: Filter
   @filter_03
   Scenario Outline: Replace patterns in Strings in Hashes
     Given I create a TeeLogger for testing filters
-    And I write a log message containing the value "<word>" for the key "<key>" in a Hash
+    And I write a log message with the Hash value "<word>" for the key "<key>"
     Then I expect the log message to <condition> the word "<word>"
 
     Examples:
@@ -50,7 +50,7 @@ Feature: Filter
   @filter_04
   Scenario Outline: Replace patterns in CLI-like arrays
     Given I create a TeeLogger for testing filters
-    And I write a log message containing the word sequence "<word1>", "<word2>"
+    And I write a log message with the word sequence "<word1>", "<word2>"
     Then I expect the log message to <condition> the word "<word2>"
 
     Examples:
@@ -62,7 +62,7 @@ Feature: Filter
   Scenario Outline: Ensure custom filter words work
     Given I create a TeeLogger for testing filters
     And I set filter words to include "<filter>"
-    And I write a log message containing the word "<word>"
+    And I write a log message with the word "<word>"
     Then I expect the log message to <condition> the word "<word>"
 
     Examples:
@@ -76,5 +76,5 @@ Feature: Filter
   Scenario: Custom filter
     Given I create a TeeLogger for testing filters
     And I register a custom filter
-    And I write a log message containing the word "foo"
+    And I write a log message with the word "foo"
     Then I expect the log message to not contain the word "foo"

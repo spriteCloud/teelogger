@@ -10,7 +10,9 @@ Given(/^I create a Formatter with the "([^"]*)" format string$/) do |constant|
   formatter = ::TeeLogger::Formatter.new(format)
 end
 
-Given(/^I call it with parameters "([^"]*)", "([^"]*)", "([^"]*)" and "([^"]*)"$/) do |severity, time, progname, message|
+Given(
+    /^I call it with parameters "([^"]*)", "([^"]*)", "([^"]*)" and "([^"]*)"$/
+) do |severity, time, progname, message|
   # The time needs to be parsed to make some kind of sense; anything else
   # can just be passed through. For time parsing, we need to temporarily force
   # the timezone to UTC, otherwise the tests will run differently on different
@@ -25,6 +27,6 @@ end
 
 Then(/^I expect the result to match "([^"]*)"$/) do |expected|
   regex = Regexp.new("^#{expected}$")
-  assert regex.match(result), "Expected to match '#{regex}' (#{expected}), but got '#{result}'"
+  assert regex.match(result), "Expected to match '#{regex}' (#{expected}), "\
+    "but got '#{result}'"
 end
-

@@ -3,9 +3,10 @@ CodeClimate::TestReporter.start
 
 # Simple assert function
 def assert(condition, message = "Unknown reason")
-  if not condition
-    raise message
+  if condition
+    return
   end
+  raise message
 end
 
 require "teelogger"
