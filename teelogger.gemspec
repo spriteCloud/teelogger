@@ -8,8 +8,11 @@ Gem::Specification.new do |spec|
   spec.version       = TeeLogger::VERSION
   spec.authors       = ["Jens Finkhaeuser"]
   spec.email         = ["foss@spritecloud.com"]
-  spec.summary       = %q{Mini wrapper around Ruby Logger for logging to multiple destinations.}
-  spec.description   = %q{Mini wrapper around Ruby Logger for logging to multiple destinations.}
+  spec.summary       = "Mini wrapper around Ruby Logger for logging to "\
+                       "multiple destinations."
+  spec.description   = "Mini wrapper around Ruby Logger for logging to "\
+                       "multiple destinations. Adds filtering and other "\
+                       "extensions."
   spec.homepage      = "https://github.com/spriteCloud/teelogger"
   spec.license       = "MITNFA"
 

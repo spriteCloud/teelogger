@@ -41,25 +41,16 @@ module TeeLogger
     include ::TeeLogger::Levels
     include ::TeeLogger::Filter
 
-    # Properties
-    @default_level
-    @formatter
-    @loggers
-    @ios
-
-
-private
     ##
     # Define log functions as strings, for internal re-use
-    LOG_FUNCTIONS = Logger::Severity.constants.map { |level| string_level(level.to_s).downcase }
-
-public
+    LOG_FUNCTIONS = Logger::Severity.constants.map do |level|
+      string_level(level.to_s).downcase
+    end
 
     ##
     # Add a logger to the current loggers.
     def add_logger(arg)
       key = nil
-      logger = nil
       io = nil
       if arg.is_a? String
         # We have a filename
@@ -67,11 +58,6 @@ public
 
         # Try to create the logger.
         io = File.new(arg, File::WRONLY | File::APPEND | File::CREAT)
-        logger = Logger.new(io)
-
-        # Initialize logger
-        io.write "Logging to '#{arg}' initialized with level #{string_level(@default_level)}.\n"
-        logger.level = convert_level(@default_level)
       else
         # We have some other object - let's hope it's an IO object
         key = nil
@@ -86,12 +72,13 @@ public
 
         # Try to create the logger.
         io = arg
-        logger = Logger.new(io)
-
-        # Initialize logger
-        io.write "Logging to #{key} initialized with level #{string_level(@default_level)}.\n"
-        logger.level = convert_level(@default_level)
       end
+
+      # Initialize logger
+      logger = Logger.new(io)
+      io.write "Logging to #{key} initialized with level "\
+          "#{string_level(@default_level)}.\n"
+      logger.level = convert_level(@default_level)
 
       # Set the logger formatter
       logger.formatter = @formatter
@@ -109,7 +96,6 @@ public
         @ios[key] = io
       end
     end
-
 
     ##
     # Start with any amount of IO objects or filenames; defaults to STDOUT
@@ -134,7 +120,6 @@ public
       end
     end
 
-
     ##
     # Set log level; override this to also accept strings
     def level=(val)
@@ -145,11 +130,10 @@ public
       @default_level = val
 
       # Set all loggers' log levels
-      @loggers.each do |key, logger|
+      @loggers.each do |_, logger|
         logger.level = val
       end
     end
-
 
     ##
     # Set the formatter
@@ -158,11 +142,10 @@ public
       @formatter = formatter
 
       # Set all loggers' formatters
-      @loggers.each do |key, logger|
+      @loggers.each do |_, logger|
         logger.formatter = formatter
       end
     end
-
 
     ##
     # Log an exception
@@ -170,38 +153,39 @@ public
       error("#{message} got #{ex.message}:\n#{ex.backtrace.join("\n")}")
     end
 
-
     ##
     # For each log level, define an appropriate logging function
-    ["add"] + LOG_FUNCTIONS.each do |meth|
+    (["add"] + LOG_FUNCTIONS).each do |meth|
       # Methods corresponding to severity levels will be auto_flushed
-      define_method(meth) { |*args, &block|
+      define_method(meth) do |*args, &block|
         x = dispatch(meth, *args, &block)
         dispatch("auto_flush")
         x
-      }
+      end
 
       # Query methods for severity levels are defined
-      if not ["unknown", "add"].include? meth
-        query = "#{meth}?"
-        define_method(query)  { |*args, &block|
-          dispatch(query, *args, &block)
-        }
+      if %w(unknown add).include? meth
+        next
+      end
+
+      query = "#{meth}?"
+      define_method(query) do |*args, &block|
+        dispatch(query, *args, &block)
       end
     end
-
 
     ##
     # Add flush related functions from LoggerExtensions
     LoggerExtensions.instance_methods(false).each do |method|
       name = method.to_s
-      if name.start_with?("flush")
-        define_method(name) { |*args, &block|
-          dispatch(name, *args, &block)
-        }
+      if not name.start_with?("flush")
+        next
+      end
+
+      define_method(name) do |*args, &block|
+        dispatch(name, *args, &block)
       end
     end
-
 
     ##
     # Every function this class doesn't have should be mapped to the original
@@ -214,7 +198,7 @@ public
       meth_name = meth.to_s
 
       # All loggers are the same, so we need to check only one of them.
-      @loggers.each do |key, logger|
+      @loggers.each do |_, logger|
         if logger.respond_to?(meth_name, include_private)
           return true
         end
@@ -225,12 +209,13 @@ public
       return @loggers.respond_to?(meth_name, include_private)
     end
 
+    # rubocop:disable Style/MethodMissing
     def method_missing(meth, *args, &block)
       dispatch(meth, *args, &block)
     end
+    # rubocop:enable Style/MethodMissing
 
-  private
-
+    private
 
     def dispatch(meth, *args, &block)
       if @loggers.nil? or @loggers.empty?
@@ -258,7 +243,6 @@ public
       return @loggers.send(meth_name, *args, &block)
     end
 
-
     def dispatch_log(meth_name, *args)
       # Filter all arguments
       args = apply_filters(*args)
@@ -276,19 +260,19 @@ public
       # Try to write the message to all loggers.
       ret = []
       @loggers.each do |key, logger|
-        if logger.respond_to? meth_name
-          ret << logger.send(meth_name, key) do
-            message
-          end
+        if not logger.respond_to? meth_name
+          next
+        end
+        ret << logger.send(meth_name, key) do
+          message
         end
       end
       return ret
     end
 
-
     def dispatch_other(meth_name, *args, &block)
       ret = []
-      @loggers.each do |key, logger|
+      @loggers.each do |_, logger|
         if logger.respond_to? meth_name
           ret << logger.send(meth_name, *args, &block)
         end

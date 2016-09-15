@@ -10,7 +10,6 @@ Cucumber::Rake::Task.new(:cuke) do |t|
                     "--order=random --backtrace"
 end
 
-
 # Combined test task
 desc "Test all the things!"
 task :test do

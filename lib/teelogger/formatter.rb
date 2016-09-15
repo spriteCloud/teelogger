@@ -51,9 +51,9 @@ module TeeLogger
       $PID.to_s
     end
 
-    module_function :severity, :short_severity, :logger_timestamp,
-                    :iso8601_timestamp, :iso8601_timestamp_utc,
-                    :tai64n_timestamp, :logger, :message, :pid
+    # rubocop:disable Style/ModuleFunction
+    extend self
+    # rubocop:enable Style/ModuleFunction
   end # module FormatterPlaceholders
 
   ##

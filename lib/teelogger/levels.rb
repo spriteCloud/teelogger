@@ -6,6 +6,8 @@
 # All rights reserved.
 #
 module TeeLogger
+  ##
+  # Module for defining log-level related functionality
   module Levels
     ##
     # Convert a log level to its string name
